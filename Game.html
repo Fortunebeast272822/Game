@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Shooting Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            background-color: #222;
+            color: #fff;
+        }
+
+        #player {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background-color: #00f;
+            border-radius: 50%;
+        }
+
+        #bullet {
+            position: absolute;
+            width: 5px;
+            height: 20px;
+            background-color: #f00;
+            display: none;
+        }
+
+        .enemy {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: #0f0;
+            border-radius: 50%;
+            animation: moveEnemy 5s linear infinite;
+        }
+
+        @keyframes moveEnemy {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(100vh);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <div id="player"></div>
+        <div id="bullet"></div>
+        <div class="enemy" style="left: 10%;"></div>
+        <div class="enemy" style="left: 40%;"></div>
+        <div class="enemy" style="left: 70%;"></div>
+    </div>
+
+    <script>
+        document.addEventListener('keydown', function(e) {
+            if (e.code === 'Space') {
+                shoot();
+            }
+        });
+
+        function shoot() {
+            const bullet = document.getElementById('bullet');
+            const player = document.getElementById('player');
+
+            bullet.style.left = player.offsetLeft + 'px';
+            bullet.style.bottom = player.offsetHeight + 'px';
+            bullet.style.display = 'block';
+
+            const bulletMovement = setInterval(function() {
+                const bulletPosition = bullet.offsetTop;
+                bullet.style.bottom = bulletPosition + 10 + 'px';
+
+                if (bulletPosition > window.innerHeight) {
+                    bullet.style.display = 'none';
+                    clearInterval(bulletMovement);
+                }
+
+                checkCollision();
+            }, 16);
+        }
+
+        function checkCollision() {
+            const bullet = document.getElementById('bullet');
+            const enemies = document.querySelectorAll('.enemy');
+
+            enemies.forEach(function(enemy) {
+                if (isColliding(bullet, enemy)) {
+                    bullet.style.display = 'none';
+                    enemy.style.display = 'none';
+                }
+            });
+        }
+
+        function isColliding(element1, element2) {
+            const rect1 = element1.getBoundingClientRect();
+            const rect2 = element2.getBoundingClientRect();
+
+            return !(
+                rect1.bottom < rect2.top ||
+                rect1.top > rect2.bottom ||
+                rect1.right < rect2.left ||
+                rect1.left > rect2.right
+            );
+        }
+    </script>
+
+</body>
+</html>
